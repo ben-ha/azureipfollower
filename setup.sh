@@ -11,11 +11,12 @@ cert_location=$(echo $output | awk '{print $3}')
 base64_cert=$(base64 -i $cert_location)
 rm $cert_location
 
-# Allow service principal to change NSG rules
-az role assignment create --assignee "$appid" --role "Network Contributor"
-
-# get tenant id
+# get tenant id and subscription id
 tenant_id=$(az account show --query tenantId -o tsv)
+subscription_id=$(az account show --query id -o tsv)
+
+# Allow service principal to change NSG rules
+az role assignment create --assignee "$appid" --role "Network Contributor" --scope "/subscriptions/$subscription_id"
 
 echo "TENANT_ID=$tenant_id" > .env
 echo "APP_ID=$appid" >> .env
